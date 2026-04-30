@@ -1,0 +1,11 @@
+{
+  "id": "MoreTino",
+  "name": "MoreTino",
+  "author": "Shoe",
+  "description": "English-only joke mod: rewrites every player-visible 'tion' to 'tino'.",
+  "version": "v0.0.1",
+  "has_pck": false,
+  "has_dll": true,
+  "dependencies": ["BaseLib"],
+  "affects_gameplay": false
+}

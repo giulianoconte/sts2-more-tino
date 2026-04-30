@@ -1,0 +1,43 @@
+memory/
+agents.md
+CLAUDE.md
+agents.private.md
+MoreTino/libs/
+
+# Release archives
+MoreTino-*.zip
+
+# .NET build outputs
+**/bin/
+**/obj/
+
+# NuGet
+*.nupkg
+*.snupkg
+**/packages/
+
+# Rider / VS / VS Code
+.idea/
+.vs/
+.vscode/
+*.user
+*.suo
+*.userprefs
+
+# Local overrides
+local.props
+
+# Godot
+*.import
+.godot/
+MoreTino/dist/
+
+# Build-copy targets when ModsPath resolves to project-relative.
+MoreTino/MoreTino/MoreTino.dll
+MoreTino/MoreTino/MoreTino.pck
+MoreTino/MoreTino/MoreTino.json
+MoreTino/BaseLib/
+
+# OS
+.DS_Store
+Thumbs.db
