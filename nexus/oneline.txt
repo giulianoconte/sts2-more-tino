@@ -1,0 +1,1 @@
+Rewrites every "tion" to "tino" everywhere in the game. English only.
