@@ -83,6 +83,10 @@ internal static class LocManagerSetLanguagePatch
     /// Returns the same string instance (reference-equal) when no
     /// substitution occurred, so the caller can cheaply skip the dict write.
     ///
+    /// Also preserves "additional" (and its case/suffix variants) -- without
+    /// this guard "additional" -> "additinoal" reads worse than the joke is
+    /// worth, and the word appears in a lot of card text.
+    ///
     /// Limitation: SmartFormat's "{{" / "}}" literal-brace escape is
     /// treated as opening/closing two placeholders, so any "tion" inside
     /// "{{...}}" is left alone. Vanilla loc strings don't appear to use
@@ -127,7 +131,8 @@ internal static class LocManagerSetLanguagePatch
                 && i + 3 < value.Length
                 && value[i + 1] == 'i'
                 && value[i + 2] == 'o'
-                && value[i + 3] == 'n')
+                && value[i + 3] == 'n'
+                && !IsInsideAdditional(value, i))
             {
                 sb.Append(c == 'T' ? "Tino" : "tino");
                 i += 3; // for-loop increment handles the +4th
@@ -136,5 +141,22 @@ internal static class LocManagerSetLanguagePatch
             sb.Append(c);
         }
         return sb.ToString();
+    }
+
+    /// True when the "tion" starting at tionStart is the middle of "additional"
+    /// (or any case-variant). Catches "additional", "Additional", and the
+    /// suffix forms like "additionally"/"additionals" -- anything where "tion"
+    /// is preceded by "addi" and followed by "al". Case-insensitive on the
+    /// surrounding letters so it also handles a hypothetical all-caps
+    /// "ADDITIONAL" if/when ALL_CAPS rewrite support is added.
+    private static bool IsInsideAdditional(string value, int tionStart)
+    {
+        if (tionStart < 4 || tionStart + 6 > value.Length) return false;
+        return char.ToLowerInvariant(value[tionStart - 4]) == 'a'
+            && char.ToLowerInvariant(value[tionStart - 3]) == 'd'
+            && char.ToLowerInvariant(value[tionStart - 2]) == 'd'
+            && char.ToLowerInvariant(value[tionStart - 1]) == 'i'
+            && char.ToLowerInvariant(value[tionStart + 4]) == 'a'
+            && char.ToLowerInvariant(value[tionStart + 5]) == 'l';
     }
 }
