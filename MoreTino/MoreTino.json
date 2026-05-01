@@ -2,9 +2,9 @@
   "id": "MoreTino",
   "name": "MoreTino",
   "author": "Shoe",
-  "description": "English-only joke mod: rewrites every player-visible 'tion' to 'tino'.",
+  "description": "Rewrites every \"tion\" to \"tino\" everywhere in the game. English only.",
   "version": "v0.0.1",
-  "has_pck": false,
+  "has_pck": true,
   "has_dll": true,
   "dependencies": ["BaseLib"],
   "affects_gameplay": false

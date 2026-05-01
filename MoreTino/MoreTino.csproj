@@ -89,6 +89,9 @@
         <Error
                 Text=" Slay the Spire 2 data not found at path '$(Sts2DataDir)'"
                 Condition="'$(Sts2DataDir)' == '' or !Exists('$(Sts2DataDir)')" />
+        <Warning
+                Text=" Godot not found at path '$(GodotPath)' - .pck export will be skipped (mod_image will not appear in the mod menu)."
+                Condition="'$(GodotPath)' == '' or !Exists('$(GodotPath)')" />
     </Target>
 
     <Target Name="CopyToModsFolderOnBuild" AfterTargets="PostBuildEvent">
@@ -100,6 +103,33 @@
             <BaseLibFiles Include="$(NuGetPackageRoot)/alchyr.sts2.baselib/$(BaseLibVersion)/lib/**/BaseLib.dll;$(NuGetPackageRoot)/alchyr.sts2.baselib/$(BaseLibVersion)/Content/BaseLib.pck;$(NuGetPackageRoot)/alchyr.sts2.baselib/$(BaseLibVersion)/Content/BaseLib.json;"/>
         </ItemGroup>
         <Copy SourceFiles="@(BaseLibFiles)" DestinationFolder="$(ModsPath)BaseLib/" />
+    </Target>
+
+    <!-- Godot .pck export — packages resources in MoreTino/ subdir (currently
+         just mod_image.png) into MoreTino.pck alongside the DLL. Required for
+         the mod thumbnail to appear in the in-game mod menu: BaseLib loads it
+         from res://MoreTino/mod_image.png inside the pck.
+         Needs Godot 4.5.1 (or MegaDot 4.5.1) on-disk — path set in local.props.
+         Runs the Godot binary headless with the "BasicExport" preset from
+         export_presets.cfg. Skipped (with a warning from CheckDependencyPaths)
+         if GodotPath isn't configured. -->
+    <ItemGroup>
+        <GodotPckInput Include="project.godot;export_presets.cfg;MoreTino/**/*" />
+    </ItemGroup>
+
+    <Target Name="GodotPublish" AfterTargets="CopyToModsFolderOnBuild"
+            Condition="'$(GodotPath)' != '' and Exists('$(GodotPath)') and '$(IsInnerGodotExport)' != 'true'"
+            Inputs="@(GodotPckInput)"
+            Outputs="$(ModsPath)$(MSBuildProjectName)/$(MSBuildProjectName).pck">
+        <Message Text="Exporting Godot .pck to mods folder" Importance="high"/>
+        <Exec Command="&quot;$(GodotPath)&quot; --headless --export-pack &quot;BasicExport&quot; &quot;$(ModsPath)$(MSBuildProjectName)/$(MSBuildProjectName).pck&quot;"
+              EnvironmentVariables="IsInnerGodotExport=true;MSBUILDDISABLENODEREUSE=1"
+              ContinueOnError="WarnAndContinue"/>
+    </Target>
+
+    <Target Name="GodotPublishSkipped" AfterTargets="CopyToModsFolderOnBuild"
+            Condition="'$(GodotPath)' == '' or !Exists('$(GodotPath)')">
+        <Message Text="Skipping Godot .pck export because GodotPath is not configured." Importance="high"/>
     </Target>
 
     <Import Project="local.props" Condition="Exists('local.props')" />
