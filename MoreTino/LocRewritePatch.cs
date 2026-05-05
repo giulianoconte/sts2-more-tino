@@ -73,12 +73,27 @@ internal static class LocManagerSetLanguagePatch
             $"MoreTino: rewrote {totalRewritten}/{totalEntries} loc entries across {tables.Count} tables (eng).");
     }
 
-    /// Rewrites "tion" -> "tino" / "Tion" -> "Tino", but only outside of
-    /// SmartFormat placeholders ({...}) and BBCode tags ([...]). Variable
-    /// names and tag attributes can legitimately contain "tion" (e.g.
-    /// "{exceptionType}" in main_menu_ui.MOD_ERROR.EXCEPTION; in principle
-    /// also "[icon=potion]" or similar BBCode attributes), and rewriting
-    /// them breaks template lookup or tag resolution.
+    /// Rewrites "tion" -> "tino" / "Tion" -> "Tino" only in spans that render
+    /// as user-visible English text. Two kinds of context are skipped:
+    ///
+    /// 1. BBCode tag interiors ("[...]") — tag names and attributes like
+    ///    "[icon=potion]" must be preserved or the tag stops resolving.
+    ///
+    /// 2. SmartFormat placeholder selector/formatter slots. A placeholder
+    ///    has the shape "{selector[:formatter[:literal_options]]}". The
+    ///    selector (e.g. "exceptionType" in main_menu_ui.MOD_ERROR.EXCEPTION)
+    ///    and formatter name (e.g. "plural", "cond", "choose") must be
+    ///    preserved verbatim — rewriting them breaks lookups. But the
+    ///    literal_options slot (after the second ':') contains user-facing
+    ///    English: "{Potions:plural:potion|potions}" needs to render as
+    ///    "potinos" when count != 1, otherwise plural-bearing strings like
+    ///    Phial Holster's relic description leak unrewritten "potions".
+    ///
+    /// To distinguish the slots we track a per-brace-depth count of colons
+    /// seen at that depth. Rewriting is enabled outside braces, or at depths
+    /// where we're past the second colon. Nested braces inside literal
+    /// options (e.g. "{Persist:cond:>1?[blue]{Persist}[/blue] |}") get their
+    /// own depth frame, so the inner selector is still preserved.
     ///
     /// Returns the same string instance (reference-equal) when no
     /// substitution occurred, so the caller can cheaply skip the dict write.
@@ -100,7 +115,7 @@ internal static class LocManagerSetLanguagePatch
         }
 
         var sb = new System.Text.StringBuilder(value.Length);
-        int braceDepth = 0;
+        var colonsAtDepth = new List<int>();
         bool inBracket = false;
         for (int i = 0; i < value.Length; i++)
         {
@@ -108,11 +123,11 @@ internal static class LocManagerSetLanguagePatch
             switch (c)
             {
                 case '{':
-                    braceDepth++;
+                    colonsAtDepth.Add(0);
                     sb.Append(c);
                     continue;
                 case '}':
-                    if (braceDepth > 0) braceDepth--;
+                    if (colonsAtDepth.Count > 0) colonsAtDepth.RemoveAt(colonsAtDepth.Count - 1);
                     sb.Append(c);
                     continue;
                 case '[':
@@ -123,9 +138,14 @@ internal static class LocManagerSetLanguagePatch
                     inBracket = false;
                     sb.Append(c);
                     continue;
+                case ':':
+                    if (colonsAtDepth.Count > 0) colonsAtDepth[^1]++;
+                    sb.Append(c);
+                    continue;
             }
 
-            bool plainText = braceDepth == 0 && !inBracket;
+            bool inLiteralSlot = colonsAtDepth.Count == 0 || colonsAtDepth[^1] >= 2;
+            bool plainText = inLiteralSlot && !inBracket;
             if (plainText
                 && (c == 't' || c == 'T')
                 && i + 3 < value.Length
