@@ -102,6 +102,12 @@ internal static class LocManagerSetLanguagePatch
     /// this guard "additional" -> "additinoal" reads worse than the joke is
     /// worth, and the word appears in a lot of card text.
     ///
+    /// Symmetric reversed rule: "noit" -> "onit" / "Noit" -> "Onit". The
+    /// Reflections event title is "Reflections snoitcelfeR" (intentional
+    /// mirror flavor), so without this the forward half rewrites to
+    /// "Reflectinos" but the reversed half stays "snoitcelfeR" — visibly
+    /// inconsistent. Reversing the rewrite produces "sonitcelfeR".
+    ///
     /// Limitation: SmartFormat's "{{" / "}}" literal-brace escape is
     /// treated as opening/closing two placeholders, so any "tion" inside
     /// "{{...}}" is left alone. Vanilla loc strings don't appear to use
@@ -109,7 +115,9 @@ internal static class LocManagerSetLanguagePatch
     internal static string Rewrite(string value)
     {
         if (value.IndexOf("tion", System.StringComparison.Ordinal) < 0
-            && value.IndexOf("Tion", System.StringComparison.Ordinal) < 0)
+            && value.IndexOf("Tion", System.StringComparison.Ordinal) < 0
+            && value.IndexOf("noit", System.StringComparison.Ordinal) < 0
+            && value.IndexOf("Noit", System.StringComparison.Ordinal) < 0)
         {
             return value;
         }
@@ -156,6 +164,17 @@ internal static class LocManagerSetLanguagePatch
             {
                 sb.Append(c == 'T' ? "Tino" : "tino");
                 i += 3; // for-loop increment handles the +4th
+                continue;
+            }
+            if (plainText
+                && (c == 'n' || c == 'N')
+                && i + 3 < value.Length
+                && value[i + 1] == 'o'
+                && value[i + 2] == 'i'
+                && value[i + 3] == 't')
+            {
+                sb.Append(c == 'N' ? "Onit" : "onit");
+                i += 3;
                 continue;
             }
             sb.Append(c);
