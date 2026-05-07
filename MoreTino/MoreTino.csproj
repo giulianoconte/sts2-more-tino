@@ -49,6 +49,15 @@
         <BaseLibVersion>3.1.0</BaseLibVersion>
     </PropertyGroup>
 
+    <!-- DeployToMods gates the post-build copy + Godot .pck export targets.
+         Default false so a plain `dotnet build` is verify-only and does not
+         touch ModsPath (which on a configured machine points at the live
+         game install). The deploy.sh / redeploy.sh scripts pass
+         /p:DeployToMods=true to opt in. -->
+    <PropertyGroup>
+        <DeployToMods Condition="'$(DeployToMods)' == ''">false</DeployToMods>
+    </PropertyGroup>
+
     <ItemGroup Condition="Exists('$(Sts2DataDir)')" >
         <Reference Include="0Harmony">
             <HintPath>$(Sts2DataDir)/0Harmony.dll</HintPath>
@@ -94,7 +103,8 @@
                 Condition="'$(GodotPath)' == '' or !Exists('$(GodotPath)')" />
     </Target>
 
-    <Target Name="CopyToModsFolderOnBuild" AfterTargets="PostBuildEvent">
+    <Target Name="CopyToModsFolderOnBuild" AfterTargets="PostBuildEvent"
+            Condition="'$(DeployToMods)' == 'true'">
         <Message Text="Copying .dll and manifest to mods folder." Importance="high" />
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/" />
         <Copy SourceFiles="MoreTino.json" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/" />
@@ -118,7 +128,7 @@
     </ItemGroup>
 
     <Target Name="GodotPublish" AfterTargets="CopyToModsFolderOnBuild"
-            Condition="'$(GodotPath)' != '' and Exists('$(GodotPath)') and '$(IsInnerGodotExport)' != 'true'"
+            Condition="'$(DeployToMods)' == 'true' and '$(GodotPath)' != '' and Exists('$(GodotPath)') and '$(IsInnerGodotExport)' != 'true'"
             Inputs="@(GodotPckInput)"
             Outputs="$(ModsPath)$(MSBuildProjectName)/$(MSBuildProjectName).pck">
         <Message Text="Exporting Godot .pck to mods folder" Importance="high"/>
@@ -128,7 +138,7 @@
     </Target>
 
     <Target Name="GodotPublishSkipped" AfterTargets="CopyToModsFolderOnBuild"
-            Condition="'$(GodotPath)' == '' or !Exists('$(GodotPath)')">
+            Condition="'$(DeployToMods)' == 'true' and ('$(GodotPath)' == '' or !Exists('$(GodotPath)'))">
         <Message Text="Skipping Godot .pck export because GodotPath is not configured." Importance="high"/>
     </Target>
 
