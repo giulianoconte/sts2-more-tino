@@ -46,7 +46,7 @@
 
     <PropertyGroup>
         <NoWarn>$(NoWarn);MSB3270;STS002</NoWarn>
-        <BaseLibVersion>3.1.2</BaseLibVersion>
+        <BaseLibVersion>3.1.0</BaseLibVersion>
     </PropertyGroup>
 
     <!-- DeployToMods gates the post-build copy + Godot .pck export targets.
