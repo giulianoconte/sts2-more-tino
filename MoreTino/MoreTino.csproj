@@ -108,11 +108,32 @@
         <Message Text="Copying .dll and manifest to mods folder." Importance="high" />
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/" />
         <Copy SourceFiles="MoreTino.json" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/" />
-        <Message Text="Copying BaseLib to mods folder." Importance="high" />
-        <ItemGroup>
+        <!-- BaseLibVersion is a minimum floor for deployment, not a hard pin.
+             If the deployed BaseLib.json reports a version >= floor, leave
+             it alone (a newer install belongs to another mod or a manual
+             update). Only deploy when nothing's there or it's older. -->
+        <PropertyGroup>
+            <_DeployedBaseLibJson>$(ModsPath)BaseLib/BaseLib.json</_DeployedBaseLibJson>
+            <_DeployedBaseLibText Condition="Exists('$(_DeployedBaseLibJson)')">$([System.IO.File]::ReadAllText('$(_DeployedBaseLibJson)'))</_DeployedBaseLibText>
+            <_DeployedBaseLibVersion Condition="'$(_DeployedBaseLibText)' != ''">$([System.Text.RegularExpressions.Regex]::Match($(_DeployedBaseLibText), '"version"\s*:\s*"v?([0-9]+(?:\.[0-9]+){1,3})"').Groups.get_Item(1).Value)</_DeployedBaseLibVersion>
+        </PropertyGroup>
+        <PropertyGroup Condition="'$(_DeployedBaseLibVersion)' != ''">
+            <_BaseLibVersionCompare>$([System.Version]::Parse('$(_DeployedBaseLibVersion)').CompareTo($([System.Version]::Parse('$(BaseLibVersion)'))))</_BaseLibVersionCompare>
+        </PropertyGroup>
+        <PropertyGroup>
+            <_BaseLibSatisfied>false</_BaseLibSatisfied>
+            <_BaseLibSatisfied Condition="'$(_BaseLibVersionCompare)' != '' and $(_BaseLibVersionCompare) &gt;= 0">true</_BaseLibSatisfied>
+        </PropertyGroup>
+
+        <Message Condition="'$(_BaseLibSatisfied)' == 'true'"
+                 Text="Skipping BaseLib copy: deployed v$(_DeployedBaseLibVersion) satisfies floor v$(BaseLibVersion)." Importance="high" />
+        <Message Condition="'$(_BaseLibSatisfied)' != 'true'"
+                 Text="Copying BaseLib v$(BaseLibVersion) to mods folder (deployed: '$(_DeployedBaseLibVersion)')." Importance="high" />
+        <ItemGroup Condition="'$(_BaseLibSatisfied)' != 'true'">
             <BaseLibFiles Include="$(NuGetPackageRoot)/alchyr.sts2.baselib/$(BaseLibVersion)/lib/**/BaseLib.dll;$(NuGetPackageRoot)/alchyr.sts2.baselib/$(BaseLibVersion)/Content/BaseLib.pck;$(NuGetPackageRoot)/alchyr.sts2.baselib/$(BaseLibVersion)/Content/BaseLib.json;"/>
         </ItemGroup>
-        <Copy SourceFiles="@(BaseLibFiles)" DestinationFolder="$(ModsPath)BaseLib/" />
+        <Copy Condition="'$(_BaseLibSatisfied)' != 'true'"
+              SourceFiles="@(BaseLibFiles)" DestinationFolder="$(ModsPath)BaseLib/" />
     </Target>
 
     <!-- Godot .pck export — packages resources in MoreTino/ subdir (currently
