@@ -6,11 +6,13 @@ source "$SCRIPT_DIR/lock-helper.sh"
 NO_WATCH=false
 FORCE=false
 RELEASE=false
+INSTALL=false
 for arg in "$@"; do
     case "$arg" in
         --no-watch) NO_WATCH=true ;;
         --force)    FORCE=true ;;
         --release)  RELEASE=true ;;
+        --release-install) INSTALL=true; RELEASE=true ;;
     esac
 done
 
@@ -23,6 +25,12 @@ if $RELEASE; then
     rm -f "$ARCHIVE"
     (cd "$DIST_DIR" && zip -r "$ARCHIVE" MoreTino)
     echo "Release archive: $ARCHIVE"
+    if $INSTALL; then
+        MODS_DIR=/media/sf_sts2-mods
+        cp "$ARCHIVE" "$MODS_DIR/"
+        rm -rf "$MODS_DIR/MoreTino"
+        unzip -q "$MODS_DIR/$(basename "$ARCHIVE")" -d "$MODS_DIR"
+    fi
 else
     dotnet build $SCRIPT_DIR/MoreTino/MoreTino.csproj --nologo -v quiet /p:DeployToMods=true
 fi
