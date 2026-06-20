@@ -2,27 +2,20 @@ Rewrites every visible "tion" in the game to "tino" --
 card names, potion names, relics, events, menus, run history, all of it.
 
 - Corruption -> Corruptino
-- Glowwater Potion -> Glowwater Potino
+- Gigantification Potion -> Gigantificatino Potino
 - Relic Collection -> Relic Collectino
 
 English only. Doesn't affect gameplay.
 
-------------------------------------------------------------------------
-MY OTHER MODS
-------------------------------------------------------------------------
+My Mods
+- SlayTheStats: https://www.nexusmods.com/slaythespire2/mods/349 - stats tracking
+- ExitToDesktop: https://www.nexusmods.com/slaythespire2/mods/553 - qol
+- RememberCardSort: https://www.nexusmods.com/slaythespire2/mods/801 - qol
+- MoreTino: https://www.nexusmods.com/slaythespire2/mods/753 - memes
 
-- SlayTheStats: <URL>
-- ExitToDesktop: <URL>
-
-------------------------------------------------------------------------
-REQUIREMENTS
-------------------------------------------------------------------------
-
+Requirements
 - BaseLib v3.1.0 or later: https://www.nexusmods.com/slaythespire2/mods/103
 
-------------------------------------------------------------------------
-INSTALLATION
-------------------------------------------------------------------------
-
+Installation
 Extract MoreTino-vX.X.X.zip into your mods folder so you end up with a
-MoreTino/ folder containing MoreTino.dll and MoreTino.json.
+MoreTino/ folder containing MoreTino.dll, MoreTino.pck, and MoreTino.json. 
