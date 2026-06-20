@@ -1,5 +1,5 @@
 {
-  "title": "More Tino",
+  "title": "MoreTino",
   "description": "Rewrites every visible \"tion\" in the game to \"tino\" --\ncard names, potion names, relics, events, menus, run history, all of it.\n\n- Corruption -> Corruptino\n- Gigantification Potion -> Gigantificatino Potino\n- Relic Collection -> Relic Collectino\n\nEnglish only. Doesn't affect gameplay.\n\nMy Mods\n- SlayTheStats: https://www.nexusmods.com/slaythespire2/mods/349 - stats tracking\n- ExitToDesktop: https://www.nexusmods.com/slaythespire2/mods/553 - qol\n- RememberCardSort: https://www.nexusmods.com/slaythespire2/mods/801 - qol\n- MoreTino: https://www.nexusmods.com/slaythespire2/mods/753 - memes\n\nRequirements\n- BaseLib v3.1.0 or later: https://www.nexusmods.com/slaythespire2/mods/103\n\nInstallation\nExtract MoreTino-vX.X.X.zip into your mods folder so you end up with a\nMoreTino/ folder containing MoreTino.dll, MoreTino.pck, and MoreTino.json.\n",
   "visibility": "private",
   "changeNote": "",
