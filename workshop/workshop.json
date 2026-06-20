@@ -1,0 +1,10 @@
+{
+  "title": "More Tino",
+  "description": "Rewrites every visible \"tion\" in the game to \"tino\" — card names, potions, relics, events, menus, run history, all of it. Corruption → Corruptino, Relic Collection → Relic Collectino. English only. Doesn't affect gameplay.",
+  "visibility": "private",
+  "changeNote": "",
+  "tags": [],
+  "dependencies": [3737335127],
+  "minBranch": null,
+  "maxBranch": null
+}
