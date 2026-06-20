@@ -1,0 +1,21 @@
+Rewrites every visible "tion" in the game to "tino" --
+card names, potion names, relics, events, menus, run history, all of it.
+
+- Corruption -> Corruptino
+- Gigantification Potion -> Gigantificatino Potino
+- Relic Collection -> Relic Collectino
+
+English only. Doesn't affect gameplay.
+
+My Mods
+- SlayTheStats: https://steamcommunity.com/sharedfiles/filedetails/?id=3748220195 - stats tracking
+- ExitToDesktop: https://steamcommunity.com/sharedfiles/filedetails/?id=3748205321 - qol
+- RememberCardSort: https://steamcommunity.com/sharedfiles/filedetails/?id=3748206153 - qol
+- MoreTino: https://steamcommunity.com/sharedfiles/filedetails/?id=3748206477 - memes
+
+Requirements
+- BaseLib v3.1.0 or later: https://steamcommunity.com/sharedfiles/filedetails/?id=3737335127
+
+Installation
+Extract MoreTino-vX.X.X.zip into your mods folder so you end up with a
+MoreTino/ folder containing MoreTino.dll, MoreTino.pck, and MoreTino.json. 
